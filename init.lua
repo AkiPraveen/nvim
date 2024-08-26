@@ -6,6 +6,7 @@
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
+
 -- copy/paste -> Mac native
 vim.g.neovide_input_use_logo = 1 -- enable use of the logo (cmd) key
 vim.keymap.set('n', '<D-v>', '+p<CR>', { noremap = true, silent = true})
@@ -177,6 +178,4 @@ vim.keymap.set('n', '<leader>ff', require('telescope.builtin').find_files, { des
 vim.keymap.set('n', '<leader>fg', require('telescope.builtin').live_grep, { desc = 'Live grep' })
 vim.keymap.set('n', '<leader>fb', require('telescope.builtin').buffers, { desc = 'Buffers' })
 vim.keymap.set('n', '<leader>fh', require('telescope.builtin').help_tags, { desc = 'Help tags' })
-
-
 
