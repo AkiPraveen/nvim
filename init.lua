@@ -168,7 +168,7 @@ require("lazy").setup({
 vim.g.neovide_cursor_vfx_mode = "wireframe"
 
 -- Set theme
-vim.cmd("colorscheme carbonfox")
+vim.cmd("colorscheme dayfox")
 
 
 -- Telescope keybinds:
