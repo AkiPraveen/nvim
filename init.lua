@@ -102,6 +102,9 @@ require("lazy").setup({
             width = 35,
             relativenumber = true,
           },
+          update_focused_file = {
+            enable = true,
+          },
           -- change folder arrow icons
           renderer = {
             indent_markers = {
@@ -168,7 +171,7 @@ require("lazy").setup({
 vim.g.neovide_cursor_vfx_mode = "wireframe"
 
 -- Set theme
-vim.cmd("colorscheme carbonfox")
+vim.cmd("colorscheme dayfox")
 
 
 -- Telescope keybinds:
