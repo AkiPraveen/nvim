@@ -1,5 +1,5 @@
--- Aki's neovim lua dotfile
--- Best used with neovide
+-- AKI NEOVIM CONFIG
+-- BEST USED WITH NEOVIDE
 -- Comments below explaining functionality
 
 -- Set leader key to space
@@ -64,9 +64,27 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
+-- Add padding to the left and right
+vim.opt.numberwidth = 1       -- Reserve 4 columns for line numbers
+
+-- Add padding to the top and bottom
+vim.opt.scrolloff = 8         -- Keep 8 lines above and below the cursor
+
+-- Add extra padding on all sides (available since Neovide 0.10.4)
+if vim.g.neovide then
+  vim.g.neovide_padding_top = 10
+  vim.g.neovide_padding_right = 10
+  vim.g.neovide_padding_left = 10
+end
+
+-- Set the command line height to 1
+vim.opt.cmdheight = 1
+
+vim.opt.number = true
+vim.opt.relativenumber = true
 
 
--- Setup lazy nvim
+-- PLUGINS: Setup lazy nvim
 require("lazy").setup({
   spec = {
     -- Copilot
@@ -161,6 +179,14 @@ require("lazy").setup({
             indent = { enable = true },  
           })
       end
+    },
+    -- LSP (Language server)
+    {
+      "neovim/nvim-lspconfig",
+      dependencies = {
+        "williamboman/mason.nvim",
+        "williamboman/mason-lspconfig.nvim",
+      },
     }
   },
   install = { colorscheme = { "nightfox" } },  
@@ -171,7 +197,7 @@ require("lazy").setup({
 vim.g.neovide_cursor_vfx_mode = "wireframe"
 
 -- Set theme
-vim.cmd("colorscheme nightfox")
+vim.cmd("colorscheme carbonfox")
 
 
 -- Telescope keybinds:
@@ -181,4 +207,41 @@ vim.keymap.set('n', '<leader>ff', require('telescope.builtin').find_files, { des
 vim.keymap.set('n', '<leader>fg', require('telescope.builtin').live_grep, { desc = 'Live grep' })
 vim.keymap.set('n', '<leader>fb', require('telescope.builtin').buffers, { desc = 'Buffers' })
 vim.keymap.set('n', '<leader>fh', require('telescope.builtin').help_tags, { desc = 'Help tags' })
+
+-- LSP Configuration
+-- LSP Configuration
+local lspconfig = require("lspconfig")
+local mason = require("mason")
+local mason_lspconfig = require("mason-lspconfig")
+
+mason.setup()
+mason_lspconfig.setup()
+
+-- LSP server configurations
+local servers = {
+  "lua_ls",
+  "tsserver",
+  -- Add more servers as needed
+}
+
+mason_lspconfig.setup({
+  ensure_installed = servers,
+})
+
+-- LSP setup
+for _, server in ipairs(servers) do
+  lspconfig[server].setup({})
+end
+
+-- Keybindings
+vim.api.nvim_create_autocmd('LspAttach', {
+  group = vim.api.nvim_create_augroup('UserLspConfig', {}),
+  callback = function(ev)
+    local opts = { buffer = ev.buf }
+    vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
+    vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
+    vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, opts)
+    vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, opts)
+  end
+})
 
