@@ -234,14 +234,21 @@ for _, server in ipairs(servers) do
 end
 
 -- Keybindings
+-- Keybindings
 vim.api.nvim_create_autocmd('LspAttach', {
   group = vim.api.nvim_create_augroup('UserLspConfig', {}),
   callback = function(ev)
     local opts = { buffer = ev.buf }
-    vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
+    
+    -- Modified gd keybinding to open in new tab
+    vim.keymap.set('n', 'gd', function()
+      vim.cmd('tab split')
+      vim.lsp.buf.definition()
+    end, opts)
+
+    -- Keep other keybindings as they are
     vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
     vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, opts)
     vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, opts)
   end
 })
-
