@@ -1,4 +1,4 @@
--- AKI NEOVIM CONFIG
+-- // AKI NEOVIM CONFIG //
 -- BEST USED WITH NEOVIDE
 -- Comments below explaining functionality
 
@@ -187,7 +187,15 @@ require("lazy").setup({
         "williamboman/mason.nvim",
         "williamboman/mason-lspconfig.nvim",
       },
-    }
+    }, 
+    -- Greeter (alphavim)
+    {
+      'goolord/alpha-nvim',
+      dependencies = { 'echasnovski/mini.icons' },
+      config = function ()
+        require'alpha'.setup(require'alpha.themes.startify'.config)
+      end
+    };
   },
   install = { colorscheme = { "nightfox" } },  
   checker = { enabled = true },
@@ -252,3 +260,6 @@ vim.api.nvim_create_autocmd('LspAttach', {
     vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, opts)
   end
 })
+
+-- START SCREEN
+
