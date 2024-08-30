@@ -58,7 +58,7 @@ vim.api.nvim_create_autocmd("BufWritePre", {
 })
 
 -- Pragmatapro font
-vim.o.guifont = "PragmataPro Mono Liga:h16"
+vim.o.guifont = "PragmataPro Mono Liga:h18"
 
 -- Lazy NVIM
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
@@ -77,8 +77,12 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
+-- Line spacing
+vim.opt.linespace = 8  -- Increase this number for more spacing
+
 -- Add padding to the left and right
-vim.opt.numberwidth = 1       -- Reserve 4 columns for line numbers
+vim.opt.numberwidth = 4      -- Reserve 4 columns for line numbers
+vim.opt.signcolumn = "yes:1"  -- Adds one column of width to the right
 
 -- Add padding to the top and bottom
 vim.opt.scrolloff = 8         -- Keep 8 lines above and below the cursor
@@ -104,6 +108,11 @@ require("lazy").setup({
     { "github/copilot.vim", name = "copilot", lazy = false },
     -- Theme
     { "EdenEast/nightfox.nvim", name = "nightfox", lazy = false, priority = 1000 },
+    {
+      "Shatur/neovim-ayu",
+      lazy = false,
+      priority = 1000,
+    },
     -- Telescope: File navigation + search
     {
       'nvim-telescope/telescope.nvim',
@@ -214,7 +223,7 @@ require("lazy").setup({
       "rmagatti/goto-preview",
       config = function()
         require('goto-preview').setup {
-          width = 120; -- Width of the floating window
+          width = 125; -- Width of the floating window
           height = 25; -- Height of the floating window
           border = {"╭", "─" ,"╮", "│", "╯", "─", "╰", "│"}; -- Border characters of the floating window
           default_mappings = false; -- Bind default mappings
@@ -241,8 +250,27 @@ require("lazy").setup({
 -- Animation
 vim.g.neovide_cursor_vfx_mode = "wireframe"
 
--- Set theme
-vim.cmd("colorscheme carbonfox")
+-- THEME
+-- Function to get current hour in PST
+local function get_pst_hour()
+    local handle = io.popen("TZ='America/Los_Angeles' date +%H")
+    local result = handle:read("*a")
+    handle:close()
+    return tonumber(result)
+end
+
+-- Function to set colorscheme based on time
+local function set_colorscheme_by_time()
+    local hour = get_pst_hour()
+    if hour <= 6 and hour > 19 then
+        vim.cmd("colorscheme ayu-dark")
+    else
+        vim.cmd("colorscheme dayfox")
+    end
+end
+
+-- Call the function to set the colorscheme
+set_colorscheme_by_time()
 
 
 -- Telescope keybinds:
