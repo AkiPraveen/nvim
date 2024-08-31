@@ -209,7 +209,33 @@ require("lazy").setup({
         "williamboman/mason.nvim",
         "williamboman/mason-lspconfig.nvim",
       },
-    }, 
+    },
+    -- Git signs
+    {
+      "lewis6991/gitsigns.nvim",
+      config = function()
+        require("gitsigns").setup({
+          signs = {
+            add          = { text = '+' },
+            change       = { text = '~' },
+            delete       = { text = '_' },
+            topdelete    = { text = '‾' },
+            changedelete = { text = '~' },
+          },
+        })
+      end
+    },
+    {
+      "lukas-reineke/indent-blankline.nvim",
+      main = "ibl",
+      opts = {},
+      config = function()
+        require("ibl").setup({
+          indent = { char = "│" },
+          scope = { enabled = false },
+        })
+      end,
+    },
     -- Greeter (alphavim)
     {
       'goolord/alpha-nvim',
@@ -262,7 +288,7 @@ end
 -- Function to set colorscheme based on time
 local function set_colorscheme_by_time()
     local hour = get_pst_hour()
-    if hour <= 6 and hour > 19 then
+    if hour <= 6 or hour > 19 then
         vim.cmd("colorscheme ayu-dark")
     else
         vim.cmd("colorscheme dayfox")
