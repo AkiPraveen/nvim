@@ -58,6 +58,7 @@ vim.api.nvim_create_autocmd("BufWritePre", {
 })
 
 -- Pragmatapro font
+-- Best to install another Nerdfont so system will load it as a fallback
 vim.o.guifont = "PragmataPro Mono Liga:h18"
 
 -- Lazy NVIM
@@ -78,11 +79,11 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 -- Line spacing
-vim.opt.linespace = 8  -- Increase this number for more spacing
+vim.opt.linespace = 5  -- Increase this number for more spacing
 
 -- Add padding to the left and right
 vim.opt.numberwidth = 4      -- Reserve 4 columns for line numbers
-vim.opt.signcolumn = "yes:1"  -- Adds one column of width to the right
+vim.opt.signcolumn = "yes:2"  -- Adds one column of width to the right
 
 -- Add padding to the top and bottom
 vim.opt.scrolloff = 8         -- Keep 8 lines above and below the cursor
@@ -91,7 +92,7 @@ vim.opt.scrolloff = 8         -- Keep 8 lines above and below the cursor
 if vim.g.neovide then
   vim.g.neovide_padding_top = 10
   vim.g.neovide_padding_right = 10
-  vim.g.neovide_padding_left = 10
+  -- vim.g.neovide_padding_left = 10
 end
 
 -- Set the command line height to 1
@@ -100,14 +101,13 @@ vim.opt.cmdheight = 1
 vim.opt.number = true
 vim.opt.relativenumber = true
 
-
 -- (2) PLUGIN CONFIGURATION (using lazy.nvim)
 require("lazy").setup({
   spec = {
     -- Copilot
     { "github/copilot.vim", name = "copilot", lazy = false },
     -- Theme
-    { "EdenEast/nightfox.nvim", name = "nightfox", lazy = false, priority = 1000 },
+    { "catppuccin/nvim", name = "catppuccin", priority = 1000 },
     {
       "Shatur/neovim-ayu",
       lazy = false,
@@ -231,17 +231,45 @@ require("lazy").setup({
       opts = {},
       config = function()
         require("ibl").setup({
-          indent = { char = "│" },
+          indent = { char = "⋅" },
           scope = { enabled = false },
         })
       end,
     },
-    -- Greeter (alphavim)
+    -- GREETER
     {
       'goolord/alpha-nvim',
       dependencies = { 'echasnovski/mini.icons' },
-      config = function ()
-        require'alpha'.setup(require'alpha.themes.startify'.config)
+      config = function()
+        local alpha = require('alpha')
+        local startify = require('alpha.themes.startify')
+
+        -- Customize the header
+        startify.section.header.val = {
+          [[                                   ]],
+          [[                                   ]],
+          [[ Who dares, wins                  ]],
+          [[                                   ]],
+          [[                                   ]],
+        }
+
+        -- Ensure mini.icons is loaded
+        require('mini.icons').setup()
+
+        -- Use mini.icons for file icons (optional)
+        local function icon(fn)
+          local ext = fn:match("^.+(%..+)$")
+          return require('mini.icons').get(ext or fn)
+        end
+
+        startify.file_button = function(fn, sc, short_fn)
+          short_fn = short_fn or fn
+          local ico_txt = icon(fn) .. '  '
+          local file_button_el = startify.button(sc, ico_txt .. short_fn, '<cmd>e ' .. fn .. '<cr>')
+          return file_button_el
+        end
+
+        alpha.setup(startify.config)
       end
     },
     -- GOTO previews
@@ -267,9 +295,41 @@ require("lazy").setup({
           bufhidden = "wipe", -- the bufhidden option to set on the floating window. See :h bufhidden
         }
       end
+    },
+    -- Lualine (status bar line)
+    {
+      'nvim-lualine/lualine.nvim',
+      dependencies = { 'nvim-tree/nvim-web-devicons' },
+      config = function()
+        require('lualine').setup({
+          options = {
+            icons_enabled = true,
+            theme = 'auto',
+            component_separators = { left = '│', right = '│'},
+            section_separators = { left = '', right = ''},
+          },
+          sections = {
+            lualine_a = {'mode'},
+            lualine_b = {
+              {'branch', icon = ''},
+            },
+            lualine_c = {{'filename', path = 1}},
+            lualine_x = {'filetype'},
+            lualine_y = {'progress'},
+            lualine_z = {'location'}
+          },
+          inactive_sections = {
+            lualine_a = {},
+            lualine_b = {},
+            lualine_c = {{'filename', path = 1}},
+            lualine_x = {'location'},
+            lualine_y = {},
+            lualine_z = {}
+          },
+        })
+      end,
     }
   },
-  install = { colorscheme = { "nightfox" } },  
   checker = { enabled = true },
 })
 
@@ -289,9 +349,9 @@ end
 local function set_colorscheme_by_time()
     local hour = get_pst_hour()
     if hour <= 6 or hour > 19 then
-        vim.cmd("colorscheme ayu-dark")
+        vim.cmd("colorscheme catppuccin-mocha")
     else
-        vim.cmd("colorscheme dayfox")
+        vim.cmd("colorscheme catppuccin-frappe")
     end
 end
 
@@ -307,8 +367,7 @@ vim.keymap.set('n', '<leader>fg', require('telescope.builtin').live_grep, { desc
 vim.keymap.set('n', '<leader>fb', require('telescope.builtin').buffers, { desc = 'Buffers' })
 vim.keymap.set('n', '<leader>fh', require('telescope.builtin').help_tags, { desc = 'Help tags' })
 
--- LSP Configuration
--- LSP Configuration
+-- LSP CONFIGURATION + DIAGNOSTIC SIGNS
 local lspconfig = require("lspconfig")
 local mason = require("mason")
 local mason_lspconfig = require("mason-lspconfig")
@@ -317,11 +376,7 @@ mason.setup()
 mason_lspconfig.setup()
 
 -- LSP server configurations
-local servers = {
-  "lua_ls",
-  "tsserver",
-  -- Add more servers as needed
-}
+local servers = { "lua_ls", "tsserver" } -- Add more servers as needed
 
 mason_lspconfig.setup({
   ensure_installed = servers,
@@ -329,7 +384,39 @@ mason_lspconfig.setup({
 
 -- LSP setup
 for _, server in ipairs(servers) do
-  lspconfig[server].setup({})
+  lspconfig[server].setup({
+    -- You can add server-specific settings here if needed
+  })
+end
+
+-- Apply the diagnostic configuration
+vim.diagnostic.config({
+  virtual_text = {
+    prefix = '⬦',
+    severity_sort = true,
+  },
+  signs = true,
+  underline = true,
+  update_in_insert = false,
+  severity_sort = true,
+  float = {
+    border = 'rounded',
+    source = 'always',
+    header = '',
+    prefix = '',
+  },
+})
+
+-- Set up diagnostic signs
+local signs = {
+  { name = "DiagnosticSignError", text = "" },
+  { name = "DiagnosticSignWarn", text = "" },
+  { name = "DiagnosticSignHint", text = "" },
+  { name = "DiagnosticSignInfo", text = "" },
+}
+
+for _, sign in ipairs(signs) do
+  vim.fn.sign_define(sign.name, { texthl = sign.name, text = sign.text, numhl = "" })
 end
 
 -- GOTO defn
@@ -337,7 +424,6 @@ vim.api.nvim_create_autocmd('LspAttach', {
   group = vim.api.nvim_create_augroup('UserLspConfig', {}),
   callback = function(ev)
     local opts = { buffer = ev.buf }
-    
     -- Modified gd keybinding to open in new tab
     vim.keymap.set('n', 'gd', function()
       vim.cmd('tab split')
