@@ -12,6 +12,19 @@
 -- AKI NVIM CONFIGURATION
 -- Best used with Neovide
 --------------------------------------------------------------------------------
+-- KEYMAP LEGEND:
+--
+-- <leader> -> Space
+-- <leader>ff -> Find files
+-- <leader>fg -> Live grep
+-- <leader>fb -> Buffers
+-- <leader>fh -> Help tags
+-- <leader>ee -> Toggle file explorer
+-- <leader>ca -> Code action
+-- gd -> Goto definition (new tab)
+-- gpr -> Goto references (preview window)
+-- gpd -> Goto definition (preview window)
+--------------------------------------------------------------------------------
 
 -- (1) KEY CONFIGURATION
 
