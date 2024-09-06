@@ -430,7 +430,7 @@ mason.setup()
 mason_lspconfig.setup()
 
 -- LSP server configurations
-local servers = { "lua_ls", "tsserver" } -- Add more servers as needed
+local servers = { "lua_ls", "ts_ls" } -- Add more servers as needed
 
 mason_lspconfig.setup({
   ensure_installed = servers,
