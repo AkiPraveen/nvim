@@ -21,6 +21,8 @@
 -- <leader>fh -> Help tags
 -- <leader>ee -> Toggle file explorer
 -- <leader>ca -> Code action
+-- <leader>aa -> Launch avante
+-- <leader>ar -> Refresh avante sidebar
 -- gd -> Goto definition (new tab)
 -- gpr -> Goto references (preview window)
 -- gpd -> Goto definition (preview window)
